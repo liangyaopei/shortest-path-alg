@@ -22,7 +22,7 @@ public class AppTest
 {
     private Graph graph = new Graph();
     private WeightedGraph weightedGraph = new WeightedGraph();
-    private int times = 5;
+    private int times = 10;
     private int[] from = new int[times];
     private int[] to = new int[times];
     private int[] dir = new int[times];
