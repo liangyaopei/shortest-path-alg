@@ -30,9 +30,11 @@ public class DistanceCalculatorTest {
         graph.addEdge(2,3,8);
         int from = 1, to = 3;
 
-        PathStatistics statistics = Dijkstra.calculateDistance(graph,from,to);
+        //PathStatistics statistics = Dijkstra.calculateDistance(graph,from,to);
         //System.out.println(statistics.getDistance());
-        Assert.assertEquals(statistics.getDistance(),108);
+        //Assert.assertEquals(statistics.getDistance(),108);
+        int dist = AStar.getDistance(graph,from,to);
+        Assert.assertEquals(dist,108);
     }
 
     /**
@@ -73,13 +75,17 @@ public class DistanceCalculatorTest {
         weightedGraph.addEdge(5,4,3);
         weightedGraph.addReverseEdge(4,5,3);
 
-        PathStatistics statistics = Dijkstra.calculateDistance(graph,1,4);
-        Assert.assertEquals(statistics.getDistance(),5);
-        Assert.assertEquals(statistics.getPath(),"1->5->4");
+        int from = 1, to = 4;
 
-        PathStatistics statistics1 = BiDirectionalDijkstra
-                .getDistance(weightedGraph,1,4);
-        Assert.assertEquals(statistics1.getDistance(),5);
+       // PathStatistics statistics = Dijkstra.calculateDistance(graph,1,4);
+        //Assert.assertEquals(statistics.getDistance(),5);
+        //Assert.assertEquals(statistics.getPath(),"1->5->4");
+
+       // PathStatistics statistics1 = BiDirectionalDijkstra.getDistance(weightedGraph,1,4);
+        //Assert.assertEquals(statistics1.getDistance(),5);
+
+        int dist = AStar.getDistance(graph,from,to);
+        Assert.assertEquals(dist,5);
     }
 
 }

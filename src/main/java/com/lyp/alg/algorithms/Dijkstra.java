@@ -57,26 +57,24 @@ public class Dijkstra {
             graph.getEdge(currNodeId).forEach(graphNode -> {
                 int id = graphNode.getTo();
                 int weight = graphNode.getWeight();
+                // the id is not in visited shortest path so far
                 if(!visitedSet.contains(id)){
                     int totalDistance = weight + currDistance;
-                    Integer prefix = prefixMap.get(id);
-                    if(prefix == null){
+                    Integer tempDistance = distanceMap.get(id);
+                    //found a path towards current node id || found a shorter path towards current node id
+                    if(tempDistance == null || totalDistance<tempDistance){
                         prefixMap.put(id,currNodeId);
                         distanceMap.put(id,totalDistance);
-                    }else{
-                        Integer tempDistance = distanceMap.get(id);
-                        if(totalDistance<tempDistance){
-                            distanceMap.put(id,totalDistance);
-                            prefixMap.put(id,currNodeId);
-                        }
+                        minHeap.add(new HeapNode(id,totalDistance));
                     }
-                    HeapNode heapNode = new HeapNode(id,weight + currDistance);
-                    minHeap.add(heapNode);
+                    //HeapNode heapNode = new HeapNode(id,weight + currDistance);
+                    //minHeap.add(heapNode);
                 }
             });
 
 
         }
+       /// return new PathStatistics(from,to,shortestDistance);
         return printPath(prefixMap,from,to,shortestDistance);
     }
 
@@ -89,7 +87,7 @@ public class Dijkstra {
         while (prefix != from){
             hop++;
             stack.push(prefix);
-            prefix = prefixMap.get(prefix);
+            prefix = prefixMap.getOrDefault(prefix,from);
         }
         builder.append(from);
         while (stack.isEmpty()==false){

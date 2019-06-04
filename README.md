@@ -1,10 +1,8 @@
-这个项目实现了有向有环加权图中点对的最短路径计算，使用Java语言实现了迪杰特斯拉算法和双向迪杰特斯拉算法。在加州公路网 ([http://snap.stanford.edu/data/roadNet-CA.html](http://snap.stanford.edu/data/roadNet-CA.html) )上进行测, 公路网具有1,965,206个节点和 5,533,214条边。测试结果表明可以在这样的图中随机选取一个起始点和终点，算法可以在2000ms内找点对之间的最短路径。
+这个项目实现了有向有环加权图中点对的最短路径计算，使用Java语言实现了迪杰特斯拉算法,双向迪杰特斯拉算法和A star 算法。在加州公路网 ([http://snap.stanford.edu/data/roadNet-CA.html](http://snap.stanford.edu/data/roadNet-CA.html) )上进行测, 公路网具有1,965,206个节点和 5,533,214条边。测试结果表明可以在这样的图中随机选取一个起始点和终点，算法可以在2000ms内找点对之间的最短路径。
 
 > 程序运行时将roadNext.txt放在data文件夹下。
 
 ## 迪杰特斯拉算法
-
-
 
 ```java
 /**
@@ -159,6 +157,61 @@ public static PathStatistics getDistance(WeightedGraph graph, int from, int to){
         }
 
         return new PathStatistics(from,to,minDistance);
+    }
+```
+
+## A star算法
+
+注意a star算法寻找最短路径的正确性依赖于启发式函数的正确选择。
+
+```java
+/**
+ * pseudo code:
+ * https://medium.com/@nicholas.w.swift/easy-a-star-pathfinding-7e6689c7f7b2
+ * correctness explanation, A-star is guaranteed to provide the shortest path according to your metric function :
+ * https://stackoverflow.com/questions/16246026/is-a-star-guaranteed-to-give-the-shortest-path-in-a-2d-grid
+ * http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
+ */
+public class AStar {
+    public static int getDistance(Graph graph,int from,int to){
+        int minDistance = 0;
+        PriorityQueue<AStarNode> open = new PriorityQueue<>(
+                Comparator.comparingInt(AStarNode::getCombinedDistance)
+        );
+        Map<Integer,Integer> openMap = new HashMap<>();
+
+        Set<Integer> close = new HashSet<>();
+        open.add(new AStarNode(from,0,0,0));
+        while (!open.isEmpty()){
+            AStarNode node = open.poll();
+            close.add(node.getNodeId());
+            if(node.getNodeId() == to){
+                minDistance = node.getActualDistance();
+                break;
+            }
+            List<GraphNode> adjList = graph.getEdge(node.getNodeId());
+
+           for (GraphNode graphNode : adjList){
+               int childNodeId = graphNode.getTo();
+               int weight = graphNode.getWeight();
+               if(close.contains(childNodeId)){
+                   continue;
+               }
+               int actualDistance = node.getActualDistance() + weight;
+               int heuristic = calculateHeuristic(childNodeId,to);
+               int combinedDistance = actualDistance + heuristic;
+               AStarNode child = new AStarNode(childNodeId,actualDistance,
+                       heuristic,combinedDistance);
+
+               Integer curCombined = openMap.get(childNodeId);
+               if(curCombined != null && combinedDistance > curCombined){
+                   continue;
+               }
+               open.add(child);
+               openMap.put(childNodeId,combinedDistance);
+           }
+        }
+        return minDistance;
     }
 ```
 
